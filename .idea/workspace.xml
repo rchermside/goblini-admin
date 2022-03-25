@@ -2,14 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="c346c25f-0f84-4adb-8792-a8263164d3bc" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/codeStyles/Project.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/codeStyles/codeStyleConfig.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/goblini-admin-app/goblini-admin-app.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/goblini-admin-app/src/components/ListGuesserStuff.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/goblini-admin-app3/goblini-admin-app.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/goblini-admin-app/vite.config.js" beforeDir="false" afterPath="$PROJECT_DIR$/goblini-admin-app/vite.config.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -169,7 +163,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1648171098124</updated>
-      <workItem from="1648171099388" duration="3649000" />
+      <workItem from="1648171099388" duration="4357000" />
     </task>
     <servers />
   </component>
