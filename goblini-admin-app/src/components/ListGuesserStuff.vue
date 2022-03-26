@@ -2,6 +2,7 @@
   import {computed, ref, watchEffect} from 'vue'
   import GuessList from "./GuessList.vue";
   import QuestionList from "./QuestionList.vue";
+  import ResponseDataGrid from "./ResponseDataGrid.vue";
 
   const URL_PREFIX = "https://d3rqhmpqgpvmke.cloudfront.net/guessers/";
   const URL_SUFFIX = "Guesser.json"
@@ -33,18 +34,15 @@
       <option value="animal">Animals</option>
       <option value="dnd">D&D</option>
     </select>
-    <p>Some text goes here.</p>
+    <p>Full data file:</p>
     <textarea v-model="content" placeholder="Select guesser..."></textarea>
-    <hr/>
-    <guess-list
-        v-if="guesserData !== null"
-        :guesser-data="guesserData"
-    />
-    <hr/>
-    <question-list
-        v-if="guesserData !== null"
-        :guesser-data="guesserData"
-    />
+    <div v-if="guesserData != null">
+      <guess-list :guesser-data="guesserData"/>
+      <hr/>
+      <question-list :guesser-data="guesserData"/>
+      <hr/>
+      <response-data-grid :guesser-data="guesserData"/>
+    </div>
   </div>
 </template>
 
