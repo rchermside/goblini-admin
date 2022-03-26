@@ -6,7 +6,6 @@
 
 <template>
   <div>
-    <h2>Questions</h2>
     <div class="question-list">
       <div
           v-for="(question, index) in guesserData.questions"

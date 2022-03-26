@@ -1,24 +1,9 @@
 <script setup>
-// import HelloWorld from './components/HelloWorld.vue'
-// import TheWelcome from './components/TheWelcome.vue'
 import ListGuesserStuff from "./components/ListGuesserStuff.vue";
 </script>
 
 <template>
   <ListGuesserStuff />
-  <!--
-  <header>
-    <img alt="Vue logo" class="logo" src="./assets/logo.svg" width="125" height="125" />
-
-    <div class="wrapper">
-      <HelloWorld msg="Hello there, World!" />
-    </div>
-  </header>
-
-  <main>
-    <TheWelcome />
-  </main>
-  -->
 </template>
 
 <style>

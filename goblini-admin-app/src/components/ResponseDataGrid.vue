@@ -8,7 +8,6 @@
 
 <template>
   <div>
-    <h2>Response Data</h2>
     <table class="response-data-grid">
       <tr>
         <td></td>

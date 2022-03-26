@@ -6,7 +6,6 @@
 
 <template>
   <div>
-    <h2>Guesses</h2>
     <div class="guess-list">
       <div
           v-for="guess in guesserData.guessArray"
