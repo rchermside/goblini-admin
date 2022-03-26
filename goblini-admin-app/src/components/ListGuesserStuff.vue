@@ -1,6 +1,7 @@
 <script setup>
   import {computed, ref, watchEffect} from 'vue'
   import GuessList from "./GuessList.vue";
+  import QuestionList from "./QuestionList.vue";
 
   const URL_PREFIX = "https://d3rqhmpqgpvmke.cloudfront.net/guessers/";
   const URL_SUFFIX = "Guesser.json"
@@ -36,6 +37,11 @@
     <textarea v-model="content" placeholder="Select guesser..."></textarea>
     <hr/>
     <guess-list
+        v-if="guesserData !== null"
+        :guesser-data="guesserData"
+    />
+    <hr/>
+    <question-list
         v-if="guesserData !== null"
         :guesser-data="guesserData"
     />

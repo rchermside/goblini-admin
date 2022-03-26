@@ -6,18 +6,18 @@
 
 <template>
   <div>
-    <h2>Guesses</h2>
-    <div class="guess-list">
+    <h2>Questions</h2>
+    <div class="question-list">
       <div
-          v-for="guess in guesserData.guessArray"
-          :key="guess.guessId"
-      >{{guess.name}}</div>
+          v-for="(question, index) in guesserData.questions"
+          :key="index"
+      >{{question.question}}</div>
     </div>
   </div>
 </template>
 
 <style scoped>
-  .guess-list {
+  .question-list {
     display: flex;
     flex-direction: column;
     overflow-y: scroll;
