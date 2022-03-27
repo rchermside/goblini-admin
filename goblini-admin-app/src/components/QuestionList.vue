@@ -5,12 +5,13 @@
 </script>
 
 <template>
-  <div>
-    <div class="question-list">
-      <div
-          v-for="(question, index) in guesserData.questions"
-          :key="index"
-      >{{question.question}}</div>
+  <div class="question-list">
+    <div
+        v-for="(question, index) in guesserData.questions"
+        :key="index"
+    >
+      <button @click="$emit('showQuestion', question)">view</button>
+      <span>{{question.question}}</span>
     </div>
   </div>
 </template>
@@ -23,5 +24,8 @@
     height: 200px;
     border: 1px solid black;
     margin: 5px;
+  }
+  button {
+    margin-right: 5px;
   }
 </style>

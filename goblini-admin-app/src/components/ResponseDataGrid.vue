@@ -14,13 +14,14 @@
         <th
             v-for="guess in guesserData.guessArray"
             :key="guess.guessId"
+            @click="$emit('showGuess', guess)"
         >{{guess.name}}</th>
       </tr>
       <tr
           v-for="(question, questionId) in guesserData.questions"
           :key="questionId"
       >
-        <th>{{question.question}}</th>
+        <th @click="$emit('showQuestion', question)">{{question.question}}</th>
         <response-cell
             v-for="guess in guesserData.guessArray"
             :key="guess.guessId"
@@ -44,5 +45,6 @@
   th {
     background: lightblue;
     background-clip: padding-box;
+    cursor: pointer;
   }
 </style>
