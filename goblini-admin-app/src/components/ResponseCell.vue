@@ -1,5 +1,6 @@
 <script setup>
   import {computed} from 'vue';
+  import TriColorBar from "./TriColorBar.vue";
 
   const props = defineProps({
     questionId: Number,
@@ -16,7 +17,7 @@
   });
   const maybes = computed(() => {
     const responseCount = props.question.numResponses[props.guess.guessId.toString()] || 0;
-    return (responseCount - yeses) - nos;
+    return (responseCount - yeses.value) - nos.value;
   });
 </script>
 
@@ -25,6 +26,7 @@
     <div v-if="yeses > 0">Y: {{yeses}}</div>
     <div v-if="nos > 0">N: {{nos}}</div>
     <div v-if="maybes > 0">M: {{maybes}}</div>
+    <tri-color-bar v-if="yeses + nos + maybes > 0" :width="50" :height="8" :green-val="yeses" :yellow-val="maybes" :red-val="nos"/>
   </td>
 </template>
 
