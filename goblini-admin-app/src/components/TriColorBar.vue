@@ -6,7 +6,6 @@
     yellowVal: Number,
     redVal: Number,
   });
-  console.log(props);
   const pixelsPerCount = props.width / (props.greenVal + props.yellowVal + props.redVal);
   const greenBar = props.greenVal * pixelsPerCount;
   const yellowBar = props.yellowVal * pixelsPerCount;

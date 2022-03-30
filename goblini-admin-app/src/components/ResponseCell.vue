@@ -22,13 +22,18 @@
 </script>
 
 <template>
-  <td>
+  <td class="response-cell">
     <div v-if="yeses > 0">Y: {{yeses}}</div>
     <div v-if="nos > 0">N: {{nos}}</div>
     <div v-if="maybes > 0">M: {{maybes}}</div>
-    <tri-color-bar v-if="yeses + nos + maybes > 0" :width="50" :height="8" :green-val="yeses" :yellow-val="maybes" :red-val="nos"/>
+    <tri-color-bar v-if="yeses + nos + maybes > 0" :width="50" :height="10" :green-val="yeses" :yellow-val="maybes" :red-val="nos"/>
   </td>
 </template>
 
 <style scoped>
+  td.response-cell {
+    text-align: center;
+    vertical-align: middle;
+    padding: 2px;
+  }
 </style>
