@@ -1,5 +1,5 @@
 <script setup>
-  import {computed, ref, watchEffect} from 'vue'
+  import {computed, ref, watchEffect} from 'vue';
   import ThreeTabComponent from "./ThreeTabComponent.vue";
   import GuessList from "./GuessList.vue";
   import QuestionList from "./QuestionList.vue";
@@ -28,18 +28,8 @@
     }
   });
 
-  function showSingleGuess(guess) {
-    singleFactorDisplayed.value = {
-      factorType: "guess",
-      factor: guess,
-    };
-  }
-
-  function showSingleQuestion(question) {
-    singleFactorDisplayed.value = {
-      factorType: "question",
-      factor: question,
-    };
+  function showSingleFactor(factorSpec) {
+    singleFactorDisplayed.value = factorSpec;
   }
 
 </script>
@@ -58,20 +48,19 @@
       <three-tab-component>
         <template v-slot:title0>Guesses</template>
         <template v-slot:item0>
-          <guess-list :guesser-data="guesserData" @show-guess="showSingleGuess"/>
+          <guess-list :guesser-data="guesserData" @show-factor="showSingleFactor"/>
         </template>
 
         <template v-slot:title1>Questions</template>
         <template v-slot:item1>
-          <question-list :guesser-data="guesserData" @show-question="showSingleQuestion"/>
+          <question-list :guesser-data="guesserData" @show-factor="showSingleFactor"/>
         </template>
 
         <template v-slot:title2>Response Data</template>
         <template v-slot:item2>
           <response-data-grid
               :guesser-data="guesserData"
-              @show-guess="showSingleGuess"
-              @show-question="showSingleQuestion"
+              @show-factor="showSingleFactor"
           />
         </template>
       </three-tab-component>
@@ -82,7 +71,7 @@
         @exit="() => singleFactorDisplayed = null"
         :button-names="['Back']"
     >
-      <factor-details :guesser-data="guesserData" :factor-type="singleFactorDisplayed.factorType" :factor="singleFactorDisplayed.factor"/>
+      <factor-details :guesser-type="guesserName" :guesser-data="guesserData" :factor-spec="singleFactorDisplayed"/>
     </modal-lightbox>
   </div>
 </template>

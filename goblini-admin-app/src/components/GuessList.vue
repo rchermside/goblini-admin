@@ -2,6 +2,15 @@
   const props = defineProps({
     guesserData: Object,
   });
+  const emit = defineEmits(["show-factor"]);
+
+  function onButtonClick(guess) {
+    emit("show-factor", {
+      factorType: "guess",
+      factorId: guess.guessId,
+      factor: guess,
+    });
+  }
 </script>
 
 <template>
@@ -10,7 +19,7 @@
         v-for="guess in guesserData.guessArray"
         :key="guess.guessId"
     >
-      <button @click="$emit('showGuess', guess)">view</button>
+      <button @click="onButtonClick(guess)">view</button>
       <span>{{guess.name}}</span>
     </div>
   </div>

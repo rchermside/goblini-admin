@@ -4,6 +4,11 @@
   const props = defineProps({
     guesserData: Object,
   });
+  const emit = defineEmits(["show-factor"]);
+
+  function onHeaderClick(factorType, factorId, factor) {
+    emit("show-factor", {factorType, factorId, factor});
+  }
 </script>
 
 <template>
@@ -14,7 +19,7 @@
         <th
             v-for="guess in guesserData.guessArray"
             :key="guess.guessId"
-            @click="$emit('showGuess', guess)"
+            @click="onHeaderClick('guess', guess.guessId, guess)"
             class="fixed-top-row"
         >{{guess.name}}</th>
       </tr>
@@ -22,7 +27,7 @@
           v-for="(question, questionId) in guesserData.questions"
           :key="questionId"
       >
-        <th @click="$emit('showQuestion', question)" class="fixed-left-col">{{question.question}}</th>
+        <th @click="onHeaderClick('question', questionId, question)" class="fixed-left-col">{{question.question}}</th>
         <response-cell
             v-for="guess in guesserData.guessArray"
             :key="guess.guessId"

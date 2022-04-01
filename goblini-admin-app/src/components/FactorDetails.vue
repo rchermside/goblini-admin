@@ -5,62 +5,121 @@
   --  (displaying questions for a guess and displaying guesses for a question).
   -->
 <script setup>
+  import {ref} from 'vue';
+
   const props = defineProps({
+    guesserType: String,
     guesserData: Object,
-    factorType: String, // either "question" or "guess"
-    factor: Object, // if factorType === "question" this is a Question; if factorType === "guess" this is a guess
+    factorSpec: Object, // contains three fields:
+            // factorType: String -- either "question" or "guess"
+            // factorId: Number -- the qID or gID of the factor (whichever applies)
+            // factor: Object -- if factorType === "question" this is a Question; if factorType === "guess" this is a guess
   });
 
   // This has TWO lists of functions to use for the various parts of the page, depending on
   // the value of factorType.
   const functionList = {
     guess: {
-      title: props.factor.name,
+      title: props.factorSpec.factor.name,
       otherFactorList: props.guesserData.questions,
       otherFactorName: function(question) {
         return question.question;
       },
       yeses: function(question) {
-        return question.numYeses[props.factor.guessId.toString()] || 0;
+        return question.numYeses[props.factorSpec.factor.guessId.toString()] || 0;
       },
       nos: function(question) {
-        return question.numNos[props.factor.guessId.toString()] || 0;
+        return question.numNos[props.factorSpec.factor.guessId.toString()] || 0;
       },
       maybes: function(question) {
-        const responseCount = question.numResponses[props.factor.guessId.toString()] || 0;
+        const responseCount = question.numResponses[props.factorSpec.factor.guessId.toString()] || 0;
         return (responseCount - yeses(question)) - nos(question);
       }
     },
     question: {
-      title: props.factor.question,
+      title: props.factorSpec.factor.question,
       otherFactorList: props.guesserData.guessArray,
       otherFactorName: function(guess) {
         return guess.name;
       },
       yeses: function(guess) {
-        return props.factor.numYeses[guess.guessId.toString()] || 0;
+        return props.factorSpec.factor.numYeses[guess.guessId.toString()] || 0;
       },
       nos: function(guess) {
-        return props.factor.numNos[guess.guessId.toString()] || 0;
+        return props.factorSpec.factor.numNos[guess.guessId.toString()] || 0;
       },
       maybes: function(guess) {
-        const responseCount = props.factor.numResponses[guess.guessId.toString()] || 0;
+        const responseCount = props.factorSpec.factor.numResponses[guess.guessId.toString()] || 0;
         return (responseCount - yeses(guess)) - nos(guess);
       }
     },
   };
 
-  const title = functionList[props.factorType]["title"];
-  const otherFactorList = functionList[props.factorType]["otherFactorList"];
-  const otherFactorName = functionList[props.factorType]["otherFactorName"];
-  const yeses = functionList[props.factorType]["yeses"];
-  const nos = functionList[props.factorType]["nos"];
-  const maybes = functionList[props.factorType]["maybes"];
+
+  const updates = {
+    "version": 1,
+    "guesserType": props.guesserType,
+    "questions": [],
+    "guesses": [],
+    "answers": []
+  };
+
+  function onFactorEdit(event) {
+    // FIXME: This is hard-coded to assume that factorType is "guess".
+    const gIDToUpdate = props.factorSpec.factorId;
+    const existingItem = updates.guesses.find(x => x.gID === gIDToUpdate);
+    if (existingItem === undefined) {
+      // Create new update instruction
+      updates.guesses.push({
+        gID: gIDToUpdate,
+        guess: event.target.value,
+      });
+    } else {
+      // Edit existing update instruction
+      existingItem.guess = event.target.value;
+    }
+    console.log("onFactorEdit", updates); // FIXME: Remove after the updates actually go through
+  }
+
+  function onCountEdit(event, otherFactorId, otherFactor, answer) {
+    // FIXME: This is hard-coded to assume that factorType is "guess".
+    const qIDToUpdate = otherFactorId;
+    const gIDToUpdate = props.factorSpec.factorId;
+    let existingItem = updates.answers.find(x => x.qID === qIDToUpdate && x.gID === gIDToUpdate);
+    if (existingItem === undefined) {
+      // Create new answer instruction
+      existingItem = {
+        qID: qIDToUpdate,
+        gID: gIDToUpdate,
+        counts: [
+          yeses(otherFactor),
+          nos(otherFactor),
+          maybes(otherFactor),
+        ],
+      };
+      updates.answers.push(existingItem);
+    }
+    // Now edit existingItem
+    const countPos = {yes: 0, no: 1, maybe: 2}[answer];
+    existingItem.counts[countPos] = parseInt(event.target.value);
+    console.log("onFactorEdit", updates); // FIXME: Remove after the updates actually go through
+  }
+
+
+  const funcs = functionList[props.factorSpec.factorType];
+  const title           = funcs["title"];
+  const otherFactorList = funcs["otherFactorList"];
+  const otherFactorName = funcs["otherFactorName"];
+  const yeses           = funcs["yeses"];
+  const nos             = funcs["nos"];
+  const maybes          = funcs["maybes"];
 </script>
 
 <template>
   <div>
-    <h2>{{title}}</h2>
+    <h2>
+      <input type="text" :value="title" @blur="onFactorEdit"/>
+    </h2>
     <div class="factor-list">
       <div class="other-factor-row">
         <div></div>
@@ -74,15 +133,33 @@
           class="other-factor-row"
       >
         <div class="other-factor-cell">{{otherFactorName(otherFactor)}}</div>
-        <div class="answer-count">{{yeses(otherFactor)}}</div>
-        <div class="answer-count">{{nos(otherFactor)}}</div>
-        <div class="answer-count">{{maybes(otherFactor)}}</div>
+        <div class="answer-count">
+          <input type="number"
+              :value="yeses(otherFactor)"
+              @input="onCountEdit($event, index, otherFactor, 'yes')"
+          />
+        </div>
+        <div class="answer-count">
+          <input type="number"
+                 :value="nos(otherFactor)"
+                 @input="onCountEdit($event, index, otherFactor, 'no')"
+          />
+        </div>
+        <div class="answer-count">
+          <input type="number"
+                 :value="maybes(otherFactor)"
+                 @input="onCountEdit($event, index, otherFactor, 'maybe')"
+          />
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <style scoped>
+  h2 input {
+    font-size: 24px;
+  }
   .factor-list {
     display: grid;
     grid-template-columns: max-content 1fr 1fr 1fr;
@@ -109,7 +186,7 @@
     border-left: 1px solid black;
     border-top: 1px solid black;
     text-align: right;
-    padding: 0 2px;
+    padding: 0;
   }
   .answer-count:last-of-type {
     border-right: 1px solid black;
@@ -118,5 +195,9 @@
     border-top: 1px solid black;
     border-left: 1px solid black;
     max-width: 400px;
+  }
+  .answer-count input {
+    width: 4em;
+    text-align: right;
   }
 </style>
