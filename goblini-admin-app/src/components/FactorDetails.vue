@@ -5,8 +5,6 @@
   --  (displaying questions for a guess and displaying guesses for a question).
   -->
 <script setup>
-  import {ref} from 'vue';
-
   const props = defineProps({
     guesserType: String,
     guesserData: Object,
@@ -65,26 +63,55 @@
   };
 
   function onFactorEdit(event) {
-    // FIXME: This is hard-coded to assume that factorType is "guess".
-    const gIDToUpdate = props.factorSpec.factorId;
-    const existingItem = updates.guesses.find(x => x.gID === gIDToUpdate);
+    // --- Identify the qID or gID we are updating ---
+    const idToUpdate = props.factorSpec.factorId;
+
+    // --- Set things that depend on the factorType ---
+    let listToUpdate;
+    let idFieldName;
+    let nameFieldName;
+    if (props.factorSpec.factorType === "question") {
+      listToUpdate = updates.questions;
+      idFieldName = "qID";
+      nameFieldName = "question";
+    } else if (props.factorSpec.factorType === "guess") {
+      listToUpdate = updates.guesses;
+      idFieldName = "gID";
+      nameFieldName = "guess"
+    } else {
+      throw new Error("Invalid factorType");
+    }
+
+    // --- Locate or create the existingItem to update ---
+    let existingItem = listToUpdate.find(x => x[idFieldName] === idToUpdate);
     if (existingItem === undefined) {
       // Create new update instruction
-      updates.guesses.push({
-        gID: gIDToUpdate,
-        guess: event.target.value,
-      });
-    } else {
-      // Edit existing update instruction
-      existingItem.guess = event.target.value;
+      existingItem = {idFieldName: idToUpdate};
+      listToUpdate.push(existingItem);
     }
+
+    // --- Edit existingItem ---
+    existingItem[nameFieldName] = event.target.value;
+
+    // --- Logging we will take out later ---
     console.log("onFactorEdit", updates); // FIXME: Remove after the updates actually go through
   }
 
   function onCountEdit(event, otherFactorId, otherFactor, answer) {
-    // FIXME: This is hard-coded to assume that factorType is "guess".
-    const qIDToUpdate = otherFactorId;
-    const gIDToUpdate = props.factorSpec.factorId;
+    // --- Identify the qID and gID we are updating ---
+    let qIDToUpdate;
+    let gIDToUpdate;
+    if (props.factorSpec.factorType === "question") {
+      qIDToUpdate = props.factorSpec.factorId;
+      gIDToUpdate = otherFactorId;
+    } else if (props.factorSpec.factorType === "guess") {
+      qIDToUpdate = otherFactorId;
+      gIDToUpdate = props.factorSpec.factorId;
+    } else {
+      throw new Error("Invalid factorType");
+    }
+
+    // --- Locate or create the existingItem to update ---
     let existingItem = updates.answers.find(x => x.qID === qIDToUpdate && x.gID === gIDToUpdate);
     if (existingItem === undefined) {
       // Create new answer instruction
@@ -99,9 +126,12 @@
       };
       updates.answers.push(existingItem);
     }
-    // Now edit existingItem
+
+    // --- Edit existingItem ---
     const countPos = {yes: 0, no: 1, maybe: 2}[answer];
     existingItem.counts[countPos] = parseInt(event.target.value);
+
+    // --- Logging we will take out later ---
     console.log("onFactorEdit", updates); // FIXME: Remove after the updates actually go through
   }
 
