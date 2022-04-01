@@ -5,15 +5,13 @@
   import QuestionList from "./QuestionList.vue";
   import ResponseDataGrid from "./ResponseDataGrid.vue";
   import ModalLightbox from "./ModalLightbox.vue";
-  import GuessDetails from "./GuessDetails.vue";
-  import QuestionDetails from "./QuestionDetails.vue";
+  import FactorDetails from "./FactorDetails.vue";
 
   const URL_PREFIX = "https://d3rqhmpqgpvmke.cloudfront.net/guessers/";
   const URL_SUFFIX = "Guesser.json"
   const guesserName = ref("");
   const guesserData = ref(null);
-  const singleGuessDisplayed = ref(null);
-  const singleQuestionDisplayed = ref(null);
+  const singleFactorDisplayed = ref(null);
   const content = computed(() => {
     if (guesserData.value === null) {
       return "";
@@ -31,11 +29,17 @@
   });
 
   function showSingleGuess(guess) {
-    singleGuessDisplayed.value = guess;
+    singleFactorDisplayed.value = {
+      factorType: "guess",
+      factor: guess,
+    };
   }
 
   function showSingleQuestion(question) {
-    singleQuestionDisplayed.value = question;
+    singleFactorDisplayed.value = {
+      factorType: "question",
+      factor: question,
+    };
   }
 
 </script>
@@ -74,18 +78,11 @@
     </div>
     <div>...</div>
     <modal-lightbox
-        v-if="singleGuessDisplayed !== null"
-        @exit="() => singleGuessDisplayed = null"
+        v-if="singleFactorDisplayed !== null"
+        @exit="() => singleFactorDisplayed = null"
         :button-names="['Back']"
     >
-      <guess-details :guesser-data="guesserData" :guess="singleGuessDisplayed"/>
-    </modal-lightbox>
-    <modal-lightbox
-        v-if="singleQuestionDisplayed !== null"
-        @exit="() => singleQuestionDisplayed = null"
-        :button-names="['Back']"
-    >
-      <question-details :guesser-data="guesserData" :question="singleQuestionDisplayed"/>
+      <factor-details :guesser-data="guesserData" :factor-type="singleFactorDisplayed.factorType" :factor="singleFactorDisplayed.factor"/>
     </modal-lightbox>
   </div>
 </template>
