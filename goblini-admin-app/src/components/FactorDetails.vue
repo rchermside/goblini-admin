@@ -128,16 +128,30 @@
 
     // --- Edit existingItem ---
     existingItem[nameFieldName] = event.target.value;
-
-    // --- Logging we will take out later ---
-    console.log("onFactorEdit", updates); // FIXME: Remove after the updates actually go through
   }
 
 
+  function onCountInput(event, otherFactorId, otherFactor, answer) {
+    const fieldHasFocus = event.target === document.activeElement;
+    if (!fieldHasFocus) {
+      // They must have clicked to change the value. Since we won't lose focus later
+      // we have to apply the edit now.
+      onCountBlur(event, otherFactorId, otherFactor, answer);
+    }
+    // In all other cases, we can wait until they leave the field.
+  }
+
   /*
-   * Called when the user makes any change to the count of answers for a question/guess pair.
+   * Called when the user makes a change to the count of answers for a question/guess pair.
    */
-  function onCountEdit(event, otherFactorId, otherFactor, answer) {
+  function onCountBlur(event, otherFactorId, otherFactor, answer) {
+    // --- Prohibit the value from going below zero ---
+    let intValue = parseInt(event.target.value);
+    if (isNaN(intValue) || intValue < 0) {
+      intValue = 0
+      event.target.value = intValue;
+    }
+
     // --- Identify the qID and gID we are updating ---
     let qIDToUpdate;
     let gIDToUpdate;
@@ -169,10 +183,7 @@
 
     // --- Edit existingItem ---
     const countPos = {yes: 0, no: 1, maybe: 2}[answer];
-    existingItem.counts[countPos] = parseInt(event.target.value);
-
-    // --- Logging we will take out later ---
-    console.log("onFactorEdit", updates); // FIXME: Remove after the updates actually go through
+    existingItem.counts[countPos] = parseInt(intValue);
   }
 
 
@@ -206,19 +217,22 @@
         <div class="answer-count">
           <input type="number"
               :value="yeses(otherFactor)"
-              @input="onCountEdit($event, index, otherFactor, 'yes')"
+              @input="onCountInput($event, index, otherFactor, 'yes')"
+              @blur="onCountBlur($event, index, otherFactor, 'yes')"
           />
         </div>
         <div class="answer-count">
           <input type="number"
-                 :value="nos(otherFactor)"
-                 @input="onCountEdit($event, index, otherFactor, 'no')"
+             :value="nos(otherFactor)"
+             @input="onCountInput($event, index, otherFactor, 'no')"
+             @blur="onCountBlur($event, index, otherFactor, 'no')"
           />
         </div>
         <div class="answer-count">
           <input type="number"
-                 :value="maybes(otherFactor)"
-                 @input="onCountEdit($event, index, otherFactor, 'maybe')"
+             :value="maybes(otherFactor)"
+             @input="onCountInput($event, index, otherFactor, 'maybe')"
+             @blur="onCountBlur($event, index, otherFactor, 'maybe')"
           />
         </div>
       </div>
