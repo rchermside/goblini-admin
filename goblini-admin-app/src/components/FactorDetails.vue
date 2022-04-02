@@ -5,6 +5,8 @@
   --  (displaying questions for a guess and displaying guesses for a question).
   -->
 <script setup>
+  import {onBeforeUnmount} from "vue";
+
   const props = defineProps({
     guesserType: String,
     guesserData: Object,
@@ -62,6 +64,39 @@
     "answers": []
   };
 
+
+  // Do this when the component begins to exit
+  onBeforeUnmount(() => {
+    const numUpdates = updates.questions.length + updates.guesses.length + updates.answers.length;
+    if (numUpdates > 0) {
+      saveChanges();
+    }
+  });
+
+
+  /*
+   * Called when exiting the page and it's time to save.
+   */
+  function saveChanges() {
+    const guesserType = props.guesserType;
+    const updateType = "STRUCTURED_DATA_UPDATE";
+    const url = `https://55sksmvv43.execute-api.us-east-1.amazonaws.com/dev/goblini/1/update/${guesserType}/${updateType}`;
+    fetch(url, {
+      method: "PUT",
+      mode: "cors",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify(updates),
+    }).then(() => {
+      console.log("saveChanges() completed successfully.");
+    }).catch((error) => {
+      console.log("saveChanges() FAILED with error:", error);
+    });
+  }
+
+
+  /*
+   * Called when the user edits the name of the factor (question or guess).
+   */
   function onFactorEdit(event) {
     // --- Identify the qID or gID we are updating ---
     const idToUpdate = props.factorSpec.factorId;
@@ -86,7 +121,8 @@
     let existingItem = listToUpdate.find(x => x[idFieldName] === idToUpdate);
     if (existingItem === undefined) {
       // Create new update instruction
-      existingItem = {idFieldName: idToUpdate};
+      existingItem = {};
+      existingItem[idFieldName] = idToUpdate;
       listToUpdate.push(existingItem);
     }
 
@@ -97,6 +133,10 @@
     console.log("onFactorEdit", updates); // FIXME: Remove after the updates actually go through
   }
 
+
+  /*
+   * Called when the user makes any change to the count of answers for a question/guess pair.
+   */
   function onCountEdit(event, otherFactorId, otherFactor, answer) {
     // --- Identify the qID and gID we are updating ---
     let qIDToUpdate;
@@ -116,8 +156,8 @@
     if (existingItem === undefined) {
       // Create new answer instruction
       existingItem = {
-        qID: qIDToUpdate,
-        gID: gIDToUpdate,
+        "qID": qIDToUpdate,
+        "gID": gIDToUpdate,
         counts: [
           yeses(otherFactor),
           nos(otherFactor),
