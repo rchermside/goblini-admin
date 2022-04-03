@@ -159,8 +159,6 @@
     if (newVerified !== undefined) {
       item.verified = newVerified;
     }
-
-    console.log("updates", updates);
   }
 
 
@@ -226,8 +224,8 @@
       <input type="text" :value="title" @blur="onNameChange"/>
     </h2>
     <div class="factor-list">
-      <div class="other-factor-row">
-        <div>
+      <div class="other-factor-row first-row">
+        <div class="top-left-cell">
           <label>
             <input type="checkbox"
                    :value="verified"
@@ -286,7 +284,14 @@
   .other-factor-row {
     display: contents;
   }
-  .other-factor-row:last-of-type div {
+  .other-factor-row div {
+    border-bottom: 1px solid black;
+  }
+  .other-factor-row.first-row div {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: var(--color-background-soft);
     border-bottom: 1px solid black;
   }
   .answer-heading {
@@ -300,7 +305,6 @@
   }
   .answer-count {
     border-left: 1px solid black;
-    border-top: 1px solid black;
     text-align: right;
     padding: 0;
   }
@@ -308,8 +312,8 @@
     border-right: 1px solid black;
   }
   .other-factor-cell {
-    border-top: 1px solid black;
     border-left: 1px solid black;
+    padding: 0 2px;
     max-width: 400px;
   }
   .answer-count input {
