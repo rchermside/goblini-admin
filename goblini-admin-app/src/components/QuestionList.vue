@@ -9,6 +9,7 @@
       factorType: "question",
       factorId: index,
       factor: question,
+      initialMode: "view",
     });
   }
 </script>

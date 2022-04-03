@@ -69,9 +69,14 @@
     <modal-lightbox
         v-if="singleFactorDisplayed !== null"
         @exit="() => singleFactorDisplayed = null"
-        :button-names="['Back']"
+        :button-names="[]"
     >
-      <factor-details :guesser-type="guesserName" :guesser-data="guesserData" :factor-spec="singleFactorDisplayed"/>
+      <factor-details
+          :guesser-type="guesserName"
+          :guesser-data="guesserData"
+          :factor-spec="singleFactorDisplayed"
+          @exit="() => singleFactorDisplayed = null"
+      />
     </modal-lightbox>
   </div>
 </template>

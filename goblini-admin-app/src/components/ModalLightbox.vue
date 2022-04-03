@@ -7,7 +7,7 @@
 <template>
   <div class="modal-shade" @click="$emit('exit', null)">
     <div class="modal-content" @click.stop="">
-      <slot/>
+      <slot @exit="val => console.log('in lightbox')"/>
       <div class="button-row">
         <button
             v-for="buttonName in buttonNames"

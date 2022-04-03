@@ -9,6 +9,7 @@
       factorType: "guess",
       factorId: guess.guessId,
       factor: guess,
+      initialMode: "view",
     });
   }
 </script>

@@ -5,7 +5,8 @@
   --  (displaying questions for a guess and displaying guesses for a question).
   -->
 <script setup>
-  import {onBeforeUnmount} from "vue";
+  import {ref, onBeforeUnmount} from "vue";
+  import FactorDetailsCount from "./FactorDetailsCount.vue";
 
   const props = defineProps({
     guesserType: String,
@@ -14,7 +15,10 @@
             // factorType: String -- either "question" or "guess"
             // factorId: Number -- the qID or gID of the factor (whichever applies)
             // factor: Object -- if factorType === "question" this is a Question; if factorType === "guess" this is a guess
+            // initialMode: String -- either "view" or "edit" or "entry"
   });
+
+  const mode = ref(props.factorSpec.initialMode);
 
   // This has TWO lists of functions to use for the various parts of the page, depending on
   // the value of factorType.
@@ -163,19 +167,22 @@
 
 
   function onCountInput(event, otherFactorId, otherFactor, answer) {
+    console.log("onCountInput(", event, otherFactorId, otherFactor, answer, ")"); // FIXME: Remove
     const fieldHasFocus = event.target === document.activeElement;
     if (!fieldHasFocus) {
       // They must have clicked to change the value. Since we won't lose focus later
       // we have to apply the edit now.
       onCountBlur(event, otherFactorId, otherFactor, answer);
     }
-    // In all other cases, we can wait until they leave the field.
+    // In all other cases, we can wait until they leave ("blur") the field.
   }
 
   /*
    * Called when the user makes a change to the count of answers for a question/guess pair.
    */
   function onCountBlur(event, otherFactorId, otherFactor, answer) {
+    console.log("onCountBlur(", event, otherFactorId, otherFactor, answer, ")"); // FIXME: Remove
+    console.log("value", event.target.value); // FIXME: Remove
     // --- Prohibit the value from going below zero ---
     let intValue = parseInt(event.target.value);
     if (isNaN(intValue) || intValue < 0) {
@@ -223,13 +230,14 @@
     <h2>
       <input type="text" :value="title" @blur="onNameChange"/>
     </h2>
+    <div>{{mode}}</div> <!-- FIXME: Remove -->
     <div class="factor-list">
       <div class="other-factor-row first-row">
         <div class="top-left-cell">
           <label>
             <input type="checkbox"
-                   :value="verified"
-                   @change="onVerifiedChange"
+                :value="verified"
+                @change="onVerifiedChange"
             />
             Verified
           </label>
@@ -245,27 +253,39 @@
       >
         <div class="other-factor-cell">{{otherFactorName(otherFactor)}}</div>
         <div class="answer-count">
-          <input type="number"
+          <factor-details-count
+              :mode="mode"
+              answer="yes"
               :value="yeses(otherFactor)"
-              @input="onCountInput($event, index, otherFactor, 'yes')"
-              @blur="onCountBlur($event, index, otherFactor, 'yes')"
+              @input="event => onCountInput(event, index, otherFactor, 'yes')"
+              @blur="event => onCountBlur(event, index, otherFactor, 'yes')"
           />
         </div>
         <div class="answer-count">
-          <input type="number"
-             :value="nos(otherFactor)"
-             @input="onCountInput($event, index, otherFactor, 'no')"
-             @blur="onCountBlur($event, index, otherFactor, 'no')"
+          <factor-details-count
+              :mode="mode"
+              answer="no"
+              :value="nos(otherFactor)"
+              @input="event => onCountInput(event, index, otherFactor, 'no')"
+              @blur="event => onCountBlur(event, index, otherFactor, 'no')"
           />
         </div>
         <div class="answer-count">
-          <input type="number"
-             :value="maybes(otherFactor)"
-             @input="onCountInput($event, index, otherFactor, 'maybe')"
-             @blur="onCountBlur($event, index, otherFactor, 'maybe')"
+          <factor-details-count
+              :mode="mode"
+              answer="maybe"
+              :value="maybes(otherFactor)"
+              @input="event => onCountInput(event, index, otherFactor, 'maybe')"
+              @blur="event => onCountBlur(event, index, otherFactor, 'maybe')"
           />
         </div>
       </div>
+    </div>
+    <div class="button-row">
+      <button @click="$emit('exit', null)">Exit</button>
+      <button @click="mode = 'view'">View</button>
+      <button @click="mode = 'edit'">Edit</button>
+      <button disabled>Entry</button>
     </div>
   </div>
 </template>
@@ -316,8 +336,14 @@
     padding: 0 2px;
     max-width: 400px;
   }
-  .answer-count input {
-    width: 4em;
-    text-align: right;
+  .button-row {
+    margin-top: 6px;
+    margin-left: 2px;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+  }
+  .button-row button {
+    margin: 0 3px;
   }
 </style>
