@@ -21,6 +21,7 @@
   const functionList = {
     guess: {
       title: props.factorSpec.factor.name,
+      verified: props.factorSpec.factor.verified,
       otherFactorList: props.guesserData.questions,
       otherFactorName: function(question) {
         return question.question;
@@ -38,6 +39,7 @@
     },
     question: {
       title: props.factorSpec.factor.question,
+      verified: props.factorSpec.factor.verified,
       otherFactorList: props.guesserData.guessArray,
       otherFactorName: function(guess) {
         return guess.name;
@@ -54,6 +56,15 @@
       }
     },
   };
+
+  const funcs = functionList[props.factorSpec.factorType];
+  const title           = funcs["title"];
+  const verified        = funcs["verified"];
+  const otherFactorList = funcs["otherFactorList"];
+  const otherFactorName = funcs["otherFactorName"];
+  const yeses           = funcs["yeses"];
+  const nos             = funcs["nos"];
+  const maybes          = funcs["maybes"];
 
 
   const updates = {
@@ -95,9 +106,24 @@
 
 
   /*
+   * Called when the user modifies the verified flag.
+   */
+  function onVerifiedChange(event) {
+    onFactorEdit(undefined, event.target.checked);
+  }
+
+  /*
    * Called when the user edits the name of the factor (question or guess).
    */
-  function onFactorEdit(event) {
+  function onNameChange(event) {
+    onFactorEdit(event.target.value, undefined);
+  }
+
+  /*
+   * Called when the factor we are editing is modified. Either newName or newVerified
+   * can be undefined to indicate that we're leaving that alone.
+   */
+  function onFactorEdit(newName, newVerified) {
     // --- Identify the qID or gID we are updating ---
     const idToUpdate = props.factorSpec.factorId;
 
@@ -117,17 +143,24 @@
       throw new Error("Invalid factorType");
     }
 
-    // --- Locate or create the existingItem to update ---
-    let existingItem = listToUpdate.find(x => x[idFieldName] === idToUpdate);
-    if (existingItem === undefined) {
+    // --- Locate or create the item to update ---
+    let item = listToUpdate.find(x => x[idFieldName] === idToUpdate);
+    if (item === undefined) {
       // Create new update instruction
-      existingItem = {};
-      existingItem[idFieldName] = idToUpdate;
-      listToUpdate.push(existingItem);
+      item = {};
+      item[idFieldName] = idToUpdate;
+      listToUpdate.push(item);
     }
 
-    // --- Edit existingItem ---
-    existingItem[nameFieldName] = event.target.value;
+    // --- Edit item ---
+    if (newName !== undefined) {
+      item[nameFieldName] = newName;
+    }
+    if (newVerified !== undefined) {
+      item.verified = newVerified;
+    }
+
+    console.log("updates", updates);
   }
 
 
@@ -165,11 +198,11 @@
       throw new Error("Invalid factorType");
     }
 
-    // --- Locate or create the existingItem to update ---
-    let existingItem = updates.answers.find(x => x.qID === qIDToUpdate && x.gID === gIDToUpdate);
-    if (existingItem === undefined) {
+    // --- Locate or create the item to update ---
+    let item = updates.answers.find(x => x.qID === qIDToUpdate && x.gID === gIDToUpdate);
+    if (item === undefined) {
       // Create new answer instruction
-      existingItem = {
+      item = {
         "qID": qIDToUpdate,
         "gID": gIDToUpdate,
         counts: [
@@ -178,32 +211,31 @@
           maybes(otherFactor),
         ],
       };
-      updates.answers.push(existingItem);
+      updates.answers.push(item);
     }
 
-    // --- Edit existingItem ---
+    // --- Edit item ---
     const countPos = {yes: 0, no: 1, maybe: 2}[answer];
-    existingItem.counts[countPos] = parseInt(intValue);
+    item.counts[countPos] = parseInt(intValue);
   }
-
-
-  const funcs = functionList[props.factorSpec.factorType];
-  const title           = funcs["title"];
-  const otherFactorList = funcs["otherFactorList"];
-  const otherFactorName = funcs["otherFactorName"];
-  const yeses           = funcs["yeses"];
-  const nos             = funcs["nos"];
-  const maybes          = funcs["maybes"];
 </script>
 
 <template>
   <div>
     <h2>
-      <input type="text" :value="title" @blur="onFactorEdit"/>
+      <input type="text" :value="title" @blur="onNameChange"/>
     </h2>
     <div class="factor-list">
       <div class="other-factor-row">
-        <div></div>
+        <div>
+          <label>
+            <input type="checkbox"
+                   :value="verified"
+                   @change="onVerifiedChange"
+            />
+            Verified
+          </label>
+        </div>
         <div class="answer-heading">Yes</div>
         <div class="answer-heading">No</div>
         <div class="answer-heading">Maybe</div>
