@@ -5,7 +5,7 @@
   --  (displaying questions for a guess and displaying guesses for a question).
   -->
 <script setup>
-  import {ref, onBeforeUnmount} from "vue";
+  import {ref, watch, onBeforeUnmount} from "vue";
   import FactorDetailsCount from "./FactorDetailsCount.vue";
 
   const props = defineProps({
@@ -19,6 +19,10 @@
   });
 
   const mode = ref(props.factorSpec.initialMode);
+
+  watch(mode, () => {
+    saveChanges();
+  });
 
   // This has TWO lists of functions to use for the various parts of the page, depending on
   // the value of factorType.
@@ -79,20 +83,29 @@
     "answers": []
   };
 
+  function resetUpdates() {
+    updates.questions = [];
+    updates.guesses = [];
+    updates.answers = [];
+  }
+
 
   // Do this when the component begins to exit
   onBeforeUnmount(() => {
-    const numUpdates = updates.questions.length + updates.guesses.length + updates.answers.length;
-    if (numUpdates > 0) {
-      saveChanges();
-    }
+    saveChanges();
   });
 
 
   /*
-   * Called when exiting the page and it's time to save.
+   * Called when it's time to save. If there are no pending updates, this does nothing; if there are
+   * any then they get written to the server.
    */
   function saveChanges() {
+    const numUpdates = updates.questions.length + updates.guesses.length + updates.answers.length;
+    if (numUpdates === 0) {
+      return;
+    }
+
     const guesserType = props.guesserType;
     const updateType = "STRUCTURED_DATA_UPDATE";
     const url = `https://55sksmvv43.execute-api.us-east-1.amazonaws.com/dev/goblini/1/update/${guesserType}/${updateType}`;
@@ -106,6 +119,8 @@
     }).catch((error) => {
       console.log("saveChanges() FAILED with error:", error);
     });
+
+    resetUpdates();
   }
 
 
@@ -167,7 +182,6 @@
 
 
   function onCountInput(event, otherFactorId, otherFactor, answer) {
-    console.log("onCountInput(", event, otherFactorId, otherFactor, answer, ")"); // FIXME: Remove
     const fieldHasFocus = event.target === document.activeElement;
     if (!fieldHasFocus) {
       // They must have clicked to change the value. Since we won't lose focus later
@@ -181,8 +195,6 @@
    * Called when the user makes a change to the count of answers for a question/guess pair.
    */
   function onCountBlur(event, otherFactorId, otherFactor, answer) {
-    console.log("onCountBlur(", event, otherFactorId, otherFactor, answer, ")"); // FIXME: Remove
-    console.log("value", event.target.value); // FIXME: Remove
     // --- Prohibit the value from going below zero ---
     let intValue = parseInt(event.target.value);
     if (isNaN(intValue) || intValue < 0) {
@@ -223,6 +235,46 @@
     const countPos = {yes: 0, no: 1, maybe: 2}[answer];
     item.counts[countPos] = parseInt(intValue);
   }
+
+
+  /*
+   * Called when the user selects 'yes', 'no', or 'maybe' during entry of a set of answers.
+   * Should generate an update which will set use increment for the answers.
+   */
+  function onEntry(event, otherFactorId, otherFactor, answer) {
+    console.log("onEntry(", event, otherFactorId, otherFactor, answer, ") -> ", event.target.checked, answer, otherFactorId); // FIXME: Return
+
+    // --- Identify the qID and gID we are updating ---
+    let qIDToUpdate;
+    let gIDToUpdate;
+    if (props.factorSpec.factorType === "question") {
+      qIDToUpdate = props.factorSpec.factorId;
+      gIDToUpdate = otherFactorId;
+    } else if (props.factorSpec.factorType === "guess") {
+      qIDToUpdate = otherFactorId;
+      gIDToUpdate = props.factorSpec.factorId;
+    } else {
+      throw new Error("Invalid factorType");
+    }
+
+    // --- Locate or create the item to update ---
+    let item = updates.answers.find(x => x.qID === qIDToUpdate && x.gID === gIDToUpdate);
+    if (item === undefined) {
+      // Create new answer instruction
+      item = {
+        "qID": qIDToUpdate,
+        "gID": gIDToUpdate,
+      };
+      updates.answers.push(item);
+    }
+
+    // --- Edit item ---
+    item.increments = [
+      answer === "yes" ? 1 : 0,
+      answer === "no" ? 1 : 0,
+      answer === "maybe" ? 1 : 0,
+    ];
+  }
 </script>
 
 <template>
@@ -230,7 +282,6 @@
     <h2>
       <input type="text" :value="title" @blur="onNameChange"/>
     </h2>
-    <div>{{mode}}</div> <!-- FIXME: Remove -->
     <div class="factor-list">
       <div class="other-factor-row first-row">
         <div class="top-left-cell">
@@ -257,8 +308,10 @@
               :mode="mode"
               answer="yes"
               :value="yeses(otherFactor)"
+              :rowNum="index"
               @input="event => onCountInput(event, index, otherFactor, 'yes')"
               @blur="event => onCountBlur(event, index, otherFactor, 'yes')"
+              @entry="event => onEntry(event, index, otherFactor, 'yes')"
           />
         </div>
         <div class="answer-count">
@@ -266,8 +319,10 @@
               :mode="mode"
               answer="no"
               :value="nos(otherFactor)"
+              :rowNum="index"
               @input="event => onCountInput(event, index, otherFactor, 'no')"
               @blur="event => onCountBlur(event, index, otherFactor, 'no')"
+              @entry="event => onEntry(event, index, otherFactor, 'no')"
           />
         </div>
         <div class="answer-count">
@@ -275,17 +330,20 @@
               :mode="mode"
               answer="maybe"
               :value="maybes(otherFactor)"
+              :rowNum="index"
               @input="event => onCountInput(event, index, otherFactor, 'maybe')"
               @blur="event => onCountBlur(event, index, otherFactor, 'maybe')"
+              @entry="event => onEntry(event, index, otherFactor, 'maybe')"
           />
         </div>
       </div>
     </div>
     <div class="button-row">
-      <button @click="$emit('exit', null)">Exit</button>
-      <button @click="mode = 'view'">View</button>
-      <button @click="mode = 'edit'">Edit</button>
-      <button disabled>Entry</button>
+      <button @click="$emit('exit', null)">Done</button>
+      <button @click="mode = 'view'" :disabled="mode === 'view'">View</button>
+      <button @click="mode = 'edit'" :disabled="mode === 'edit'">Edit</button>
+      <button @click="mode = 'entry'" :disabled="mode === 'entry'">Entry</button>
+      <button @click="resetUpdates(); $emit('exit', null)">Cancel</button>
     </div>
   </div>
 </template>
