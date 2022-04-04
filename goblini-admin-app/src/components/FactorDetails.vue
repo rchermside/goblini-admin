@@ -280,7 +280,8 @@
 <template>
   <div>
     <h2>
-      <input type="text" :value="title" @blur="onNameChange"/>
+      <span v-if="mode === 'view'">{{title}}</span>
+      <input v-if="mode !== 'view'" type="text" :value="title" @blur="onNameChange"/>
     </h2>
     <div class="factor-list">
       <div class="other-factor-row first-row">
@@ -289,6 +290,7 @@
             <input type="checkbox"
                 :value="verified"
                 @change="onVerifiedChange"
+                :disabled="mode === 'view'"
             />
             Verified
           </label>
