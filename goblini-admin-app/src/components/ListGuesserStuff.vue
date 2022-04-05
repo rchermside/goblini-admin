@@ -11,6 +11,7 @@
   const URL_SUFFIX = "Guesser.json"
   const guesserName = ref("");
   const guesserData = ref(null);
+  const rawDataDisplayed = ref(false);
   const singleFactorDisplayed = ref(null);
   const content = computed(() => {
     if (guesserData.value === null) {
@@ -35,16 +36,21 @@
 </script>
 
 <template>
-  <div>
+  <div class="whole-thing">
     <h1>Goblini Admin Screen</h1>
-    <select v-model="guesserName">
-      <option disabled value="">Please select one</option>
-      <option value="animal">Animals</option>
-      <option value="dnd">D&D</option>
-    </select>
-    <p>Full data file:</p>
-    <textarea v-model="content" placeholder="Select guesser..."></textarea>
-    <div v-if="guesserData != null">
+    <div class="controls-row">
+      <select v-model="guesserName">
+        <option disabled value="">Please select one</option>
+        <option value="animal">Animals</option>
+        <option value="dnd">D&D</option>
+      </select>
+      <button v-if="guesserData != null" @click="rawDataDisplayed = !rawDataDisplayed">Raw JSON</button>
+    </div>
+    <div v-if="rawDataDisplayed">
+      <p>Full data file:</p>
+      <textarea v-model="content" placeholder="Select guesser..."></textarea>
+    </div>
+    <div v-if="!rawDataDisplayed && guesserData != null" class="main-display">
       <three-tab-component>
         <template v-slot:title0>Guesses</template>
         <template v-slot:item0>
@@ -82,8 +88,20 @@
 </template>
 
 <style scoped>
+  .whole-thing {
+    width: 100%;
+    height: 100%;
+  }
+  .controls-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+  }
   textarea {
-    width: 800px;
-    height: 150px;
+    width: 80vw;
+    height: 70vh;
+  }
+  .main-display {
+    max-height: 100%;
   }
 </style>

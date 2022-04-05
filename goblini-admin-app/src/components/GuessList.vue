@@ -31,7 +31,7 @@
     display: flex;
     flex-direction: column;
     overflow-y: scroll;
-    height: 200px;
+    min-height: 200px;
     border: 1px solid black;
     margin: 5px;
   }
