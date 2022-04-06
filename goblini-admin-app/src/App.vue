@@ -1,9 +1,9 @@
 <script setup>
-import ListGuesserStuff from "./components/ListGuesserStuff.vue";
+import GobliniAdminApp from "./components/GobliniAdminApp.vue";
 </script>
 
 <template>
-  <ListGuesserStuff />
+  <GobliniAdminApp />
 </template>
 
 <style>

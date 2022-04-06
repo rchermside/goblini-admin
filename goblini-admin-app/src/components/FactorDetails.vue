@@ -18,6 +18,8 @@
             // initialMode: String -- either "view" or "edit" or "entry"
   });
 
+  const emit = defineEmits(["exit", "update-guesser"]);
+
   const mode = ref(props.factorSpec.initialMode);
 
   watch(mode, () => {
@@ -101,11 +103,20 @@
    * any then they get written to the server.
    */
   function saveChanges() {
+    // --- decide if we need to save at all ---
     const numUpdates = updates.questions.length + updates.guesses.length + updates.answers.length;
     if (numUpdates === 0) {
       return;
     }
 
+    // --- Make a copy of the updates ---
+    // Design note: we want to update the guesser in memory AFTER the fetch completes successfully.
+    //   But the updates variable will have been reset by that time so we make a copy of it beforehand.
+    //   I had also been worried that the component might have been removed before that happens and
+    //   then the update might not happen, but testing shows that the event is still delivered.
+    const copyOfUpdates = {...updates};
+
+    // --- Send updates to the server ---
     const guesserType = props.guesserType;
     const updateType = "STRUCTURED_DATA_UPDATE";
     const url = `https://55sksmvv43.execute-api.us-east-1.amazonaws.com/dev/goblini/1/update/${guesserType}/${updateType}`;
@@ -116,10 +127,12 @@
       body: JSON.stringify(updates),
     }).then(() => {
       console.log("saveChanges() completed successfully.");
+      emit("update-guesser", copyOfUpdates); // update the local model
     }).catch((error) => {
       console.log("saveChanges() FAILED with error:", error);
     });
 
+    // --- Clear out the updates
     resetUpdates();
   }
 
@@ -288,7 +301,7 @@
         <div class="top-left-cell">
           <label>
             <input type="checkbox"
-                :value="verified"
+                :checked="verified"
                 @change="onVerifiedChange"
                 :disabled="mode === 'view'"
             />
