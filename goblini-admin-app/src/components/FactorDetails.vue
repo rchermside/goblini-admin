@@ -377,35 +377,38 @@
   .other-factor-row {
     display: contents;
   }
+  .other-factor-row:nth-child(even) div {
+    background: var(--color-background-contrast);
+  }
   .other-factor-row div {
-    border-bottom: 1px solid black;
+    border-bottom: 1px solid var(--color-border);
   }
   .other-factor-row.first-row div {
     position: sticky;
     top: 0;
     z-index: 1;
     background: var(--color-background-soft);
-    border-bottom: 1px solid black;
+    border-bottom: 1px solid var(--color-border);
   }
   .answer-heading {
-    border-left: 1px solid black;
-    border-top: 1px solid black;
+    border-left: 1px solid var(--color-border);
+    border-top: 1px solid var(--color-border);
     text-align: center;
     padding: 0 2px;
   }
   .answer-heading:last-of-type {
-    border-right: 1px solid black;
+    border-right: 1px solid var(--color-border);
   }
   .answer-count {
-    border-left: 1px solid black;
+    border-left: 1px solid var(--color-border);
     text-align: right;
     padding: 0;
   }
   .answer-count:last-of-type {
-    border-right: 1px solid black;
+    border-right: 1px solid var(--color-border);
   }
   .other-factor-cell {
-    border-left: 1px solid black;
+    border-left: 1px solid var(--color-border);
     padding: 0 2px;
     max-width: 400px;
   }

@@ -42,15 +42,17 @@
   .tab {
     display: flex;
     align-items: center;
-    border: 1px solid black;
+    border: 1px solid var(--color-border);
     margin: 0 2px;
     padding: 0 8px;
     cursor: pointer;
     font-weight: bold;
-    color: dimgrey;
-    background: #f2f2f2;
+    color: var(--color-text-mute);
+    background: var(--color-background-mute);
     position: relative;
     top: 2px;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
   }
   .tab:first-of-type {
     margin-left: 0;
@@ -61,16 +63,16 @@
   .tab:hover, .tab:focus {
   }
   .tab.active {
-    border-top: 2px solid black;
-    border-left: 2px solid black;
-    border-right: 2px solid black;
-    border-bottom: 2px solid white;
+    border-top: 2px solid var(--color-border);
+    border-left: 2px solid var(--color-border);
+    border-right: 2px solid var(--color-border);
+    border-bottom: 2px solid var(--color-background);
     color: inherit;
     background: inherit;
     z-index: 1;
   }
   .body {
-    border: 2px solid black;
+    border: 2px solid var(--color-border);
     overflow-x: scroll;
     overflow-y: scroll;
     max-width: 800px;

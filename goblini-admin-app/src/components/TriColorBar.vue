@@ -14,9 +14,9 @@
 
 <template>
   <svg :width="width" :height="height">
-    <rect x="0" y="0" height="8" :width="greenBar" style="fill: rgb(0,255,0)"/>
-    <rect :x="greenBar" y="0" height="8" :width="yellowBar" style="fill: rgb(255,255,0)"/>
-    <rect :x="greenBar + yellowBar" y="0" height="8" :width="redBar" style="fill: rgb(255,0,0)"/>
+    <rect x="0" y="0" height="8" :width="greenBar" style="fill: rgb(0,216,0)"/>
+    <rect :x="greenBar" y="0" height="8" :width="yellowBar" style="fill: rgb(216,216,0)"/>
+    <rect :x="greenBar + yellowBar" y="0" height="8" :width="redBar" style="fill: rgb(216,0,0)"/>
   </svg>
 </template>
 

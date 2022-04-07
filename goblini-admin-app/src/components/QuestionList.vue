@@ -32,7 +32,6 @@
     flex-direction: column;
     overflow-y: scroll;
     min-height: 200px;
-    border: 1px solid black;
     margin: 5px;
   }
   button {

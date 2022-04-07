@@ -47,11 +47,11 @@
   }
   td, th {
     padding: 1px;
-    border-bottom: 1px solid black;
-    border-right: 1px solid black;
+    border-bottom: 1px solid var(--color-border);
+    border-right: 1px solid var(--color-border);
   }
   th {
-    background: lightblue;
+    background: var(--color-splash);
     background-clip: padding-box;
     cursor: pointer;
   }
@@ -68,6 +68,6 @@
   }
   .fixed-top-row.fixed-left-col {
     z-index: 2;
-    background: white;
+    background: var(--color-background);
   }
 </style>

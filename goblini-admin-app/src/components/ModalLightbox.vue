@@ -33,9 +33,9 @@
     align-items: center;
   }
   .modal-content {
-    background-color: rgb(247, 247, 247);
+    background-color: var(--color-background-soft);
     padding: 6px;
-    border: 3px solid rgb(0, 0, 0);
+    border: 3px solid var(--color-border);
     overflow: scroll;
     max-height: 90%;
     max-width: 90%;
