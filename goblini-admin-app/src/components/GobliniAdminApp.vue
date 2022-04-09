@@ -129,7 +129,7 @@
         const oldNumResponses = question.numResponses[gID.toString()] ?? 0;
         const incrYeses = answerUpdate.increments[0];
         const incrNos = answerUpdate.increments[1];
-        const incrResponses = incrYeses + incrNos + answerUpdate.increments.get[2];
+        const incrResponses = incrYeses + incrNos + answerUpdate.increments[2];
         newNumYeses = oldNumYeses + incrYeses;
         newNumNos = oldNumNos + incrNos;
         newNumResponses = oldNumResponses + incrResponses;

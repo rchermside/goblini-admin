@@ -255,8 +255,6 @@
    * Should generate an update which will set use increment for the answers.
    */
   function onEntry(event, otherFactorId, otherFactor, answer) {
-    console.log("onEntry(", event, otherFactorId, otherFactor, answer, ") -> ", event.target.checked, answer, otherFactorId); // FIXME: Return
-
     // --- Identify the qID and gID we are updating ---
     let qIDToUpdate;
     let gIDToUpdate;
